@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import time
+from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, status
 from backend.app.schemas.telemetry import (
     MOSDACTelemetryStatus,

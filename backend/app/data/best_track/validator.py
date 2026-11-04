@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from backend.app.data.best_track.schemas import BestTrackFix
 from backend.app.data.best_track.source_registry import NIO_LAT_BOUNDS, NIO_LON_BOUNDS
 
