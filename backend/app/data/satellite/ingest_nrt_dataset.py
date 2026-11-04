@@ -1,4 +1,4 @@
-﻿"""Authentic NASA Earthdata GIBS Near-Real-Time (NRT) Satellite Dataset Ingestion.
+"""Authentic NASA Earthdata GIBS Near-Real-Time (NRT) Satellite Dataset Ingestion.
 
 Strict Scientific Zero-Fabrication Governance:
 1. Every satellite scene is fetched directly from NASA Earthdata GIBS snapshot REST API.

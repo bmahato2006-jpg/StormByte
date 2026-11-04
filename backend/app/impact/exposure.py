@@ -6,7 +6,7 @@ Follows strict Zero-Fabrication rules:
 """
 
 import math
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from backend.app.impact.impact_models import (
     InfrastructureExposure,
     InfrastructureItem,
