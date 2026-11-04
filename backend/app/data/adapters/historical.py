@@ -17,7 +17,7 @@ import io
 import json
 from datetime import datetime, timezone
 import uuid
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from backend.app.data.adapters.base import DataSourceAdapter
 from backend.app.data.schemas.observations import (
     DataSourceInfo,
