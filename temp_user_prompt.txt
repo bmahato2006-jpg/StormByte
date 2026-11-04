@@ -1,0 +1,115 @@
+<USER_REQUEST>
+CYCLONE-X — IMPLEMENT REAL HISTORICAL CYCLONE TRACK INGESTION
+FROM IMD BEST TRACK + NOAA IBTrACS
+
+IMPORTANT:
+This is an implementation task, not a mock/demo-data task.
+
+Do NOT fabricate, synthesize, interpolate, invent, or hard-code cyclone observations.
+Do NOT replace real historical observations with example tracks.
+Do NOT remove existing scientific safeguards.
+
+The goal is to add a REAL historical cyclone track data layer using:
+1. IMD RSMC New Delhi Best Track data as the primary Indian reference source.
+2. NOAA/NCEI IBTrACS North Indian Ocean (NI) subset as the secondary/open machine-readable source.
+
+The existing CYCLONE-X project already contains:
+- Cyclone Detector CNN V2
+- Trajectory LSTM V1
+- Historical INSAT-3D image catalog
+- PDF satellite archive
+- Phase 10 risk engine
+- MOSDAC NRT adapter
+- geospatial validation/provenance modules
+- historical satellite page
+- demonstration/evaluation track support
+
+DO NOT break any of those existing systems.
+
+==================================================
+1. PROJECT CONTEXT
+==================================================
+
+Project root:
+C:\Users\bmaha\OneDrive\Desktop\cyclone-x
+
+Backend:
+FastAPI
+
+Frontend:
+Next.js
+
+Existing trajectory model:
+trajectory_lstm_v1
+
+Existing scientific rule:
+Trajectory forecasting requires >= 4 genuine sequential fixes.
+
+Current problem:
+Historical Satellite analysis currently reports:
+
+INSUFFICIENT_TRACK_HISTORY
+
+because a standalone satellite image does not have a verified temporal track attached to it.
+
+We now need a REAL historical track database so CYCLONE-X can use genuine historical cyclone fixes instead of demonstration tracks.
+
+==================================================
+2. OFFICIAL DATA SOURCES
+==================================================
+
+PRIMARY SOURCE:
+IMD / RSMC New Delhi Best Track archive.
+
+Use the official RSMC New Delhi Best Track pages and downloadable annual Best Track records.
+
+The system must support historical years
+<truncated 22556 bytes>
+downloaded, parsed, validated, stored, and exposed through the API.
+
+If an official source blocks automated download or requires a manual download step:
+DO NOT fabricate success.
+
+Instead:
+1. implement the adapter,
+2. clearly report the blocking point,
+3. provide the exact manual-download location/process,
+4. make the local importer ready to consume the downloaded file.
+
+==================================================
+41. FIRST ACTION
+==================================================
+
+Before editing code:
+
+1. Inspect the existing CYCLONE-X project architecture.
+2. Inspect the existing trajectory service.
+3. Inspect existing provenance utilities.
+4. Inspect current API router registration.
+5. Inspect existing data directory conventions.
+6. Inspect whether any best-track code already exists.
+7. Inspect Python dependencies.
+
+Then implement the smallest clean integration that follows the existing architecture.
+
+Do not duplicate existing functionality.
+
+Do not remove working functionality.
+
+Do not create unnecessary mock data.
+
+Start now.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-12T05:18:43+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\data\geospatial\mosdac_adapter.py (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 3
+Other open documents:
+- c:\Users\bmaha\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\sessions\58AA1B31267F6B2220EA287FF91B8558BB0EAAA4\transfers\2026-37\cyclone-frequency-analysis-india-1891-2019.ipynb (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\data\demo_scenarios\amphan-2020.json (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\tests\test_health.py (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\core\provenance.py (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\core\logging.py (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>

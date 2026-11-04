@@ -1,0 +1,1230 @@
+<USER_REQUEST>
+CYCLONE-X — IMPLEMENT REAL HISTORICAL CYCLONE TRACK INGESTION
+FROM IMD BEST TRACK + NOAA IBTrACS
+
+IMPORTANT:
+This is an implementation task, not a mock/demo-data task.
+
+Do NOT fabricate, synthesize, interpolate, invent, or hard-code cyclone observations.
+Do NOT replace real historical observations with example tracks.
+Do NOT remove existing scientific safeguards.
+
+The goal is to add a REAL historical cyclone track data layer using:
+1. IMD RSMC New Delhi Best Track data as the primary Indian reference source.
+2. NOAA/NCEI IBTrACS North Indian Ocean (NI) subset as the secondary/open machine-readable source.
+
+The existing CYCLONE-X project already contains:
+- Cyclone Detector CNN V2
+- Trajectory LSTM V1
+- Historical INSAT-3D image catalog
+- PDF satellite archive
+- Phase 10 risk engine
+- MOSDAC NRT adapter
+- geospatial validation/provenance modules
+- historical satellite page
+- demonstration/evaluation track support
+
+DO NOT break any of those existing systems.
+
+==================================================
+1. PROJECT CONTEXT
+==================================================
+
+Project root:
+C:\Users\bmaha\OneDrive\Desktop\cyclone-x
+
+Backend:
+FastAPI
+
+Frontend:
+Next.js
+
+Existing trajectory model:
+trajectory_lstm_v1
+
+Existing scientific rule:
+Trajectory forecasting requires >= 4 genuine sequential fixes.
+
+Current problem:
+Historical Satellite analysis currently reports:
+
+INSUFFICIENT_TRACK_HISTORY
+
+because a standalone satellite image does not have a verified temporal track attached to it.
+
+We now need a REAL historical track database so CYCLONE-X can use genuine historical cyclone fixes instead of demonstration tracks.
+
+==================================================
+2. OFFICIAL DATA SOURCES
+==================================================
+
+PRIMARY SOURCE:
+IMD / RSMC New Delhi Best Track archive.
+
+Use the official RSMC New Delhi Best Track pages and downloadable annual Best Track records.
+
+The system must support historical years and must NOT assume a single static file forever.
+
+IMD source metadata must be stored in the database/file manifest as:
+
+provider = "IMD"
+dataset = "RSMC New Delhi Best Track"
+source_type = "official_historical_best_track"
+
+SECONDARY SOURCE:
+NOAA/NCEI IBTrACS.
+
+Prefer the North Indian Ocean subset:
+basin = "NI"
+
+Use an official machine-readable format such as CSV or NetCDF.
+
+Store:
+
+provider = "NOAA_NCEI"
+dataset = "IBTrACS"
+basin = "NI"
+source_type = "global_best_track_archive"
+
+Do not scrape arbitrary third-party websites.
+
+==================================================
+3. IMPLEMENT A ROBUST DATA INGESTION LAYER
+==================================================
+
+Create:
+
+backend/app/data/best_track/
+
+Suggested structure:
+
+backend/app/data/best_track/
+    __init__.py
+    schemas.py
+    source_registry.py
+    imd_adapter.py
+    ibtracs_adapter.py
+    normalizer.py
+    validator.py
+    deduplicator.py
+    merger.py
+    repository.py
+    importer.py
+    service.py
+    cli.py
+
+Do not overwrite unrelated existing modules.
+
+==================================================
+4. NORMALIZED DATA SCHEMA
+==================================================
+
+Create one canonical internal representation.
+
+Suggested fields:
+
+storm_id
+storm_name
+basin
+source
+source_record_id
+
+timestamp_utc
+
+latitude
+longitude
+
+max_wind_kt
+central_pressure_hpa
+
+storm_type
+
+is_best_track
+
+source_file
+source_url_or_reference
+
+retrieved_at_utc
+
+data_quality
+validation_status
+
+Do NOT invent values for missing fields.
+
+Use null for unavailable values.
+
+For example:
+
+latitude = null
+
+is acceptable.
+
+Do not convert missing values into zero.
+
+==================================================
+5. IMD INGESTION
+==================================================
+
+Implement a real IMD adapter.
+
+Requirements:
+
+A. Discover available annual Best Track records from the official IMD/RSMC archive.
+
+B. Support at least:
+1982 through the latest available year.
+
+C. Allow selective year import:
+
+example:
+
+--source imd
+--year 2020
+
+and:
+
+--source imd
+--year 2018 --year 2019 --year 2020
+
+D. Also support:
+
+--all-years
+
+if practical.
+
+E. Save the original downloaded files locally before parsing.
+
+Suggested:
+
+data/raw/best_track/imd/
+
+F. Create a manifest:
+
+data/processed/best_track/imd_manifest.csv
+
+Each row should contain:
+
+year
+source
+original_filename
+local_path
+source_reference
+sha256
+download_timestamp
+parse_status
+record_count
+
+G. Do not silently skip failed downloads.
+
+Write clear errors to the import report.
+
+==================================================
+6. IBTRACS INGESTION
+==================================================
+
+Implement an official NOAA/NCEI IBTrACS adapter.
+
+Prefer the North Indian Ocean subset.
+
+Download the official machine-readable dataset.
+
+Suggested storage:
+
+data/raw/best_track/ibtracs/
+
+Support CSV first.
+
+Support NetCDF if the project already has xarray/netCDF dependencies,
+or add them only if justified and documented.
+
+For CSV:
+handle multi-row headers correctly.
+
+Do not assume the first line is automatically the only header.
+
+Inspect the actual column names before parsing.
+
+Extract the canonical fields:
+
+storm identifier
+storm name
+ISO timestamp
+latitude
+longitude
+maximum sustained wind
+minimum pressure
+basin
+storm type
+
+The source may contain multiple agency observations.
+
+Do NOT accidentally duplicate the same storm fix across agencies.
+
+Preserve source-agency information where available.
+
+==================================================
+7. NORMALIZATION RULES
+==================================================
+
+Normalize every source into one canonical representation.
+
+Timestamp:
+convert to UTC-aware datetime.
+
+Latitude:
+valid range -90 to +90.
+
+Longitude:
+normalize consistently to either:
+[-180, 180]
+OR
+[0, 360]
+
+Pick ONE convention across CYCLONE-X and document it.
+
+Prefer:
+[-180, 180]
+
+Wind:
+canonical unit = knots.
+
+If a source field is not in knots:
+convert explicitly and record the conversion.
+
+Pressure:
+canonical unit = hPa.
+
+Do NOT infer wind or pressure from storm category.
+
+Do NOT infer missing latitude/longitude.
+
+==================================================
+8. DATA VALIDATION
+==================================================
+
+Every imported record must pass validation.
+
+Reject or quarantine:
+
+- invalid timestamp
+- invalid latitude
+- invalid longitude
+- impossible numeric values
+- duplicate exact records
+- malformed source rows
+
+Do NOT silently delete invalid records.
+
+Create:
+
+data/processed/best_track/validation_report.json
+
+and:
+
+data/processed/best_track/quarantine.csv
+
+Include:
+
+total_records
+valid_records
+invalid_records
+duplicate_records
+missing_coordinates
+missing_wind
+missing_pressure
+
+==================================================
+9. DEDUPLICATION
+==================================================
+
+Create deterministic deduplication.
+
+Primary duplicate key:
+
+source
+storm_id
+timestamp_utc
+
+For cross-source comparison:
+
+storm_name
+timestamp
+latitude
+longitude
+
+Do NOT simply merge all records with the same storm name.
+
+Storm names can repeat across years.
+
+Use year/storm identity and source provenance.
+
+Keep the original source records.
+
+Never destroy provenance.
+
+==================================================
+10. MERGE IMD + IBTRACS
+==================================================
+
+Create a canonical merged dataset:
+
+data/processed/best_track/north_indian_ocean_best_track.csv
+
+Also create:
+
+north_indian_ocean_best_track.json
+
+The merged dataset should preserve:
+
+source
+
+and source-specific identifiers.
+
+Priority rule:
+
+IMD is the primary reference source for Indian/North Indian Ocean historical tracks.
+
+IBTrACS is the secondary cross-source reference.
+
+Do NOT overwrite one source with another silently.
+
+If two sources disagree:
+
+preserve both observations.
+
+Record:
+
+cross_source_difference = true
+
+when appropriate.
+
+Do not create an artificial "average track" unless explicitly required.
+
+==================================================
+11. HISTORICAL STORM INDEX
+==================================================
+
+Build a searchable storm index.
+
+Create:
+
+data/processed/best_track/storm_index.csv
+
+Fields:
+
+storm_id
+storm_name
+year
+basin
+source
+start_time
+end_time
+point_count
+max_wind_kt
+min_pressure_hpa
+
+Also expose this through the backend API.
+
+==================================================
+12. BACKEND API
+==================================================
+
+Create a new FastAPI router:
+
+backend/app/api/v1/best_track.py
+
+Add endpoints:
+
+GET /api/best-track/storms
+
+Query parameters:
+
+source
+year
+basin
+storm_name
+limit
+
+GET /api/best-track/storms/{storm_id}
+
+Return all genuine fixes for that storm.
+
+GET /api/best-track/storms/{storm_id}/track
+
+Return a GeoJSON LineString or ordered track point collection.
+
+GET /api/best-track/search
+
+Search by storm name/year/source.
+
+GET /api/best-track/stats
+
+Return:
+
+total storms
+total fixes
+year range
+source counts
+basin counts
+
+POST /api/best-track/import/imd
+
+Trigger an IMD import.
+
+POST /api/best-track/import/ibtracs
+
+Trigger IBTrACS import.
+
+POST /api/best-track/import/all
+
+Run the configured safe import pipeline.
+
+IMPORTANT:
+For potentially long downloads, avoid blocking the API thread.
+
+Use a background task/job pattern consistent with the existing project architecture.
+
+==================================================
+13. TRAJECTORY LSTM INTEGRATION
+==================================================
+
+Modify the existing trajectory workflow so real historical tracks can be selected.
+
+Current rule:
+>= 4 genuine sequential fixes required.
+
+Keep this rule unchanged.
+
+Add:
+
+track_source
+
+track_provenance
+
+track_id
+
+to the trajectory request/response.
+
+When the user selects a real storm:
+
+Example:
+AMPHAN
+2020
+
+the system should load actual track fixes from the canonical best-track database.
+
+Do NOT use the old demonstration track.
+
+Only run the trajectory model when:
+
+point_count >= 4
+
+Otherwise return:
+
+INSUFFICIENT_TRACK_HISTORY
+
+==================================================
+14. VERY IMPORTANT: ACTUAL VS FORECAST
+==================================================
+
+Separate these concepts clearly.
+
+Historical observed track:
+REAL / OBSERVED
+
+LSTM forecast:
+MODEL-GENERATED / EXPERIMENTAL
+
+Do not mix them.
+
+For example:
+
+Observed historical track:
+IMD Best Track — VERIFIED HISTORICAL OBSERVATION
+
+Predicted future segment:
+Trajectory LSTM — MODEL GENERATED
+
+Do NOT draw a prediction line as if it were an official historical path.
+
+==================================================
+15. REMOVE / DE-EMPHASIZE DEMONSTRATION TRACKS
+==================================================
+
+Do not immediately delete existing demonstration tracks.
+
+Instead:
+
+Mark them as:
+
+DEMONSTRATION / EVALUATION ONLY
+
+and move real historical tracks to the primary selection list.
+
+The UI should preferably show:
+
+REAL HISTORICAL TRACKS
+
+and separately:
+
+DEMONSTRATION / EVALUATION TRACKS
+
+Real tracks must always show their source.
+
+Example:
+
+AMPHAN (2020)
+Source: IMD Best Track
+Status: VERIFIED HISTORICAL TRACK
+
+==================================================
+16. FRONTEND IMPLEMENTATION
+==================================================
+
+Modify:
+
+frontend/src/components/satellite/HistoricalSatelliteView.tsx
+
+and any appropriate trajectory/map components.
+
+Add:
+
+Historical Track Selector
+
+Filters:
+
+Source
+Year
+Storm
+Basin
+
+Example:
+
+Source:
+IMD
+NOAA IBTrACS
+Combined
+
+Year:
+2020
+
+Storm:
+AMPHAN
+
+When a real storm is selected:
+
+Show:
+
+Storm name
+Year
+Source
+Number of fixes
+Start time
+End time
+Peak observed wind
+Minimum observed pressure
+
+Then render actual observed track on Leaflet.
+
+Use actual latitude/longitude only.
+
+==================================================
+17. CONNECT HISTORICAL SATELLITE IMAGE TO TRACK
+==================================================
+
+This is CRITICAL.
+
+Do NOT automatically assume:
+
+satellite image = same storm
+
+just because both are from the same year.
+
+A historical satellite image may not have enough geospatial/time metadata.
+
+Therefore implement explicit association logic.
+
+Only associate a satellite image to an actual best-track fix when:
+
+1. timestamp is verified,
+2. location/geospatial metadata is verified,
+3. storm identity can be established.
+
+Otherwise display:
+
+TRACK ASSOCIATION:
+UNVERIFIED
+
+and do not claim the image belongs to that storm.
+
+Never fabricate timestamps or coordinates.
+
+==================================================
+18. TIME MATCHING
+==================================================
+
+Create a deterministic matching utility.
+
+Input:
+
+satellite_timestamp_utc
+satellite_lat
+satellite_lon
+storm_track
+
+Output:
+
+candidate fixes
+time difference
+distance difference
+match status
+
+Example statuses:
+
+VERIFIED_MATCH
+POSSIBLE_MATCH
+UNVERIFIED
+NO_MATCH
+
+Do NOT use arbitrary thresholds without documenting them.
+
+Keep thresholds configurable.
+
+Example config:
+
+TRACK_MATCH_MAX_TIME_HOURS
+TRACK_MATCH_MAX_DISTANCE_KM
+
+Store the matching method in provenance.
+
+==================================================
+19. REAL TRACK VS MODEL FORECAST COMPARISON
+==================================================
+
+Add an evaluation capability.
+
+For historical storms where enough fixes exist:
+
+Use earlier genuine track points as model input.
+
+Predict future position.
+
+Compare the prediction against later REAL observed best-track points.
+
+Calculate:
+
+MAE km
+RMSE km
+along-track error if practical
+cross-track error if practical
+
+At:
+
+6h
+12h
+24h
+
+This is for OFFLINE RESEARCH EVALUATION.
+
+Do not claim operational forecast accuracy.
+
+The UI must label these:
+
+HISTORICAL BACKTEST
+MODEL EVALUATION
+
+==================================================
+20. IMPORTANT DATA LEAKAGE SAFEGUARD
+==================================================
+
+Do not use future observations as model inputs.
+
+For an evaluation timestamp T:
+
+Input:
+only observations <= T
+
+Target:
+future observed position at T+6h/T+12h/T+24h
+
+Never expose future fixes to the model.
+
+Document this clearly.
+
+==================================================
+21. EXAMPLE REAL STORMS TO VERIFY
+==================================================
+
+After implementation, verify at minimum:
+
+AMPHAN — 2020
+BIPARJOY — 2023
+REMAL — 2024
+MICHAUNG — 2023
+MOCHA — 2023
+FANI — 2019
+HUDHUD — 2014
+
+Do not hard-code their tracks.
+
+The names must come from the imported datasets.
+
+==================================================
+22. IMPORT COMMANDS
+==================================================
+
+Create a CLI such as:
+
+python -m backend.app.data.best_track.cli --source ibtracs
+
+python -m backend.app.data.best_track.cli --source imd --year 2020
+
+python -m backend.app.data.best_track.cli --source imd --all-years
+
+python -m backend.app.data.best_track.cli --source all
+
+Also support:
+
+--dry-run
+
+which performs discovery/validation without modifying the canonical dataset.
+
+==================================================
+23. AUTOMATIC DOWNLOAD CACHE
+==================================================
+
+Do not download the same file every time.
+
+Use SHA256.
+
+If a source file already exists and its checksum matches:
+
+reuse it.
+
+If the remote file changes:
+
+download the new version.
+
+Never overwrite the old source file without preserving provenance.
+
+Use versioned filenames/directories where necessary.
+
+==================================================
+24. NETWORK ERROR HANDLING
+==================================================
+
+Handle:
+
+timeout
+connection error
+HTTP 404
+HTTP 403
+rate limit
+invalid response
+corrupt download
+
+Return useful error messages.
+
+Retry only safe transient errors.
+
+Use bounded retries with backoff.
+
+Do not run infinite retries.
+
+==================================================
+25. SECURITY
+==================================================
+
+No credentials are needed for this public historical-data ingestion.
+
+Do not add:
+
+IMD password
+IBTrACS password
+API key
+
+Do not ask the user for credentials.
+
+Do not print environment secrets.
+
+==================================================
+26. PROVENANCE
+==================================================
+
+Every imported dataset and every track must retain:
+
+provider
+dataset
+source reference
+retrieved_at_utc
+file hash
+parser version
+normalization version
+
+Use the project's existing provenance utilities when possible.
+
+Do not create a parallel incompatible provenance system.
+
+==================================================
+27. DATABASE / STORAGE
+==================================================
+
+First inspect the existing CYCLONE-X project.
+
+If a suitable database/repository already exists:
+integrate with it.
+
+Otherwise use a clean versioned CSV/JSON/SQLite repository.
+
+Do not introduce a large new database infrastructure unnecessarily.
+
+The first implementation should remain simple and reliable.
+
+Preferred MVP storage:
+
+SQLite
+
+or
+
+canonical CSV + indexed JSON
+
+depending on what the current architecture already uses.
+
+Choose the option that best fits the existing project.
+
+Document the decision.
+
+==================================================
+28. TESTING
+==================================================
+
+Create comprehensive tests:
+
+backend/tests/test_best_track_normalization.py
+backend/tests/test_best_track_validation.py
+backend/tests/test_best_track_deduplication.py
+backend/tests/test_best_track_imd.py
+backend/tests/test_best_track_ibtracs.py
+backend/tests/test_best_track_api.py
+backend/tests/test_trajectory_real_track.py
+backend/tests/test_track_matching.py
+
+Tests must verify:
+
+- timestamps normalized to UTC
+- latitude validation
+- longitude normalization
+- wind units
+- duplicate handling
+- missing values remain null
+- provenance preserved
+- source distinction preserved
+- >=4 fix rule remains enforced
+- future data cannot leak into historical evaluation
+- real storm selection loads genuine track data
+- demonstration track is not silently used when a real track exists
+
+Do not weaken existing tests.
+
+==================================================
+29. FIXTURES
+==================================================
+
+For unit tests only, create tiny sanitized fixtures.
+
+Do NOT fake production data.
+
+Clearly label:
+
+TEST FIXTURE ONLY
+
+Production ingestion must use the real official sources.
+
+==================================================
+30. FRONTEND SCIENTIFIC LABELING
+==================================================
+
+The UI must clearly distinguish:
+
+REAL HISTORICAL OBSERVATION
+
+MODEL-GENERATED FORECAST
+
+DEMONSTRATION / EVALUATION DATA
+
+UNVERIFIED SATELLITE-TRACK ASSOCIATION
+
+Do not use ambiguous terms such as:
+
+"actual forecast"
+
+"official prediction"
+
+"live warning"
+
+unless the data really comes from an official live warning feed.
+
+==================================================
+31. RISK ENGINE INTEGRATION
+==================================================
+
+Do not rewrite the existing Phase 10 risk engine.
+
+Instead, feed it real historical observed positions when historical mode is selected.
+
+Clearly distinguish:
+
+Historical observed risk context
+
+from
+
+Model-generated future risk estimate.
+
+Do not imply that a historical risk score is an official IMD warning.
+
+==================================================
+32. MOSDAC NRT INTEGRATION
+==================================================
+
+Do NOT change the current MOSDAC authentication behavior.
+
+Keep:
+
+CREDENTIALS_REQUIRED
+
+when NRT authorization is unavailable.
+
+Do NOT use IMD Best Track historical data as fake "live satellite data".
+
+Historical best-track data and live/NRT satellite data are separate systems.
+
+==================================================
+33. REPORTING
+==================================================
+
+Create:
+
+data/reports/best_track_ingestion_report.md
+
+Include:
+
+- sources used
+- source references
+- years successfully imported
+- storm count
+- fix count
+- IMD record count
+- IBTrACS record count
+- duplicate count
+- invalid count
+- missing coordinate count
+- missing wind count
+- files downloaded
+- SHA256 hashes
+- parser version
+- normalization rules
+- known limitations
+
+Also update:
+
+data/reports/hackathon_demo_status.md
+
+with the new subsystem status.
+
+==================================================
+34. AUTOMATED VERIFICATION
+==================================================
+
+After implementation run:
+
+C:\Python314\python.exe -m pytest -q
+
+Then:
+
+cd frontend
+npm run build
+
+Also run API smoke tests.
+
+Verify:
+
+GET /api/health
+
+GET /api/best-track/storms
+
+GET /api/best-track/stats
+
+GET /api/best-track/storms/{real-storm-id}
+
+GET /api/best-track/storms/{real-storm-id}/track
+
+==================================================
+35. BROWSER VERIFICATION
+==================================================
+
+Open the existing CYCLONE-X frontend.
+
+Verify:
+
+1. Historical Satellite page still loads.
+2. Real historical track selector appears.
+3. Select AMPHAN 2020.
+4. UI shows source = IMD or clearly identifies selected source.
+5. Actual historical track appears on map.
+6. Number of genuine fixes is shown.
+7. Trajectory LSTM can use the genuine historical sequence.
+8. Forecast segment is visually distinct from observed historical track.
+9. Satellite image does NOT claim verified association unless metadata actually supports it.
+10. No console errors.
+11. No 404 static asset errors.
+
+==================================================
+36. IMPORTANT: ACTUAL TRAJECTORY SHOULD NOW WORK
+==================================================
+
+The desired behavior after implementation is:
+
+User selects:
+
+AMPHAN — 2020
+
+System loads:
+
+REAL HISTORICAL TRACK
+from IMD Best Track / IBTrACS
+
+Example conceptual sequence:
+
+t1 -> lat/lon
+t2 -> lat/lon
+t3 -> lat/lon
+t4 -> lat/lon
+...
+
+Then:
+
+Trajectory LSTM
+
+uses genuine historical fixes.
+
+It generates:
+
+6h prediction
+12h prediction
+24h prediction
+
+Later observed best-track points are used ONLY for evaluation/comparison.
+
+==================================================
+37. DO NOT FABRICATE THE DATA COUNT
+==================================================
+
+Do not write expected counts such as:
+
+"10,000 storms"
+
+unless actually measured.
+
+At the end, report exact observed counts generated by the importer.
+
+==================================================
+38. DO NOT CHANGE INTENSITY MODEL
+==================================================
+
+This task is ONLY for:
+
+ACTUAL HISTORICAL TRACK INGESTION
+
+Do NOT start the postponed ResNet-18 intensity training.
+
+Keep current:
+
+Intensity = UNAVAILABLE
+
+until the separate validated intensity-model task is completed.
+
+==================================================
+39. DO NOT CHANGE LIVE NRT STATUS
+==================================================
+
+Keep current MOSDAC state honest.
+
+If MOSDAC credentials/authorization are unavailable:
+
+MOSDAC NRT = CREDENTIALS_REQUIRED
+
+Do not simulate live data.
+
+==================================================
+40. FINAL DELIVERABLE
+==================================================
+
+When finished, provide a concise implementation report containing:
+
+A. Files created
+B. Files modified
+C. Data sources successfully connected
+D. Downloaded files
+E. Number of historical storms
+F. Number of historical fixes
+G. Number of IMD fixes
+H. Number of IBTrACS fixes
+I. Validation results
+J. Deduplication results
+K. API endpoints added
+L. Frontend changes
+M. Trajectory LSTM integration status
+N. Browser verification result
+O. pytest result
+P. npm build result
+Q. Remaining limitations
+
+MOST IMPORTANT:
+Do not claim completion unless the official data were actually downloaded, parsed, validated, stored, and exposed through the API.
+
+If an official source blocks automated download or requires a manual download step:
+DO NOT fabricate success.
+
+Instead:
+1. implement the adapter,
+2. clearly report the blocking point,
+3. provide the exact manual-download location/process,
+4. make the local importer ready to consume the downloaded file.
+
+==================================================
+41. FIRST ACTION
+==================================================
+
+Before editing code:
+
+1. Inspect the existing CYCLONE-X project architecture.
+2. Inspect the existing trajectory service.
+3. Inspect existing provenance utilities.
+4. Inspect current API router registration.
+5. Inspect existing data directory conventions.
+6. Inspect whether any best-track code already exists.
+7. Inspect Python dependencies.
+
+Then implement the smallest clean integration that follows the existing architecture.
+
+Do not duplicate existing functionality.
+
+Do not remove working functionality.
+
+Do not create unnecessary mock data.
+
+Start now.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-12T05:18:43+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\data\geospatial\mosdac_adapter.py (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 3
+Other open documents:
+- c:\Users\bmaha\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\sessions\58AA1B31267F6B2220EA287FF91B8558BB0EAAA4\transfers\2026-37\cyclone-frequency-analysis-india-1891-2019.ipynb (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\data\demo_scenarios\amphan-2020.json (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\tests\test_health.py (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\core\provenance.py (LANGUAGE_UNSPECIFIED)
+- c:\Users\bmaha\OneDrive\Desktop\cyclone-x\backend\app\core\logging.py (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>

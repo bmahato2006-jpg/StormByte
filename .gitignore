@@ -1,0 +1,90 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Next.js build output & caches
+.next/
+frontend/.next/
+out/
+frontend/out/
+
+# Build caches, packages & artifacts
+*.pack
+*.pack.gz
+*.tsbuildinfo
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+
+# Raw and processed datasets & geospatial rasters
+data/
+backend/data/
+*.tif
+*.tiff
+*.tfw
+*.nc
+*.nc4
+*.hdf
+*.hdf5
+*.xlsx
+*.xls
+*.csv
+
+# Media & Images (Ignore all except UI assets in frontend/public/)
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+!frontend/public/**/*.png
+!frontend/public/**/*.jpg
+!frontend/public/**/*.jpeg
+!frontend/public/**/*.svg
+!frontend/public/**/*.ico
+!frontend/public/*.png
+!frontend/public/*.jpg
+!frontend/public/*.jpeg
+!frontend/public/*.svg
+!frontend/public/*.ico
+
+# Machine learning model weights, checkpoints & serialized binaries
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.pickle
+*.bin
+*.h5
+*.joblib
+*.tar.gz
+*.zip
+checkpoints/
+backend/app/ml/checkpoints/
+backend/checkpoints/
+
+# Virtual environments & Python cache
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+frontend/.env.local
+frontend/.env.*.local
+
+# Operating System & IDE metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
