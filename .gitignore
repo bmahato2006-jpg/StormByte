@@ -20,8 +20,10 @@ build/
 .pytest_cache/
 
 # Raw and processed datasets & geospatial rasters
-data/
-backend/data/
+/data/
+/backend/data/
+!backend/app/data/
+!backend/app/data/**
 *.tif
 *.tiff
 *.tfw

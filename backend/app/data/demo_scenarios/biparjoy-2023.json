@@ -1,0 +1,134 @@
+{
+  "id": "ARB-02-2023",
+  "name": "BIPARJOY",
+  "basin": "North Indian Ocean (Arabian Sea)",
+  "status": "HISTORICAL_REPLAY",
+  "currentObservation": {
+    "latitude": 21.80,
+    "longitude": 66.40,
+    "timestamp": "2023-06-14T12:00:00Z",
+    "intensity": "Very Severe Cyclonic Storm",
+    "windSpeed": 75.0,
+    "pressure": 972.0,
+    "movementDirection": "NE",
+    "movementSpeed": 8.0,
+    "dataSource": "IMD RSMC New Delhi & IBTrACS Best Track Archive",
+    "dataTimestamp": "2023-06-14T12:00:00Z"
+  },
+  "historicalTrack": [
+    {
+      "timestamp": "2023-06-06T12:00:00Z",
+      "latitude": 12.00,
+      "longitude": 66.00,
+      "intensity": "Depression",
+      "windSpeed": 25.0,
+      "pressure": 1002.0
+    },
+    {
+      "timestamp": "2023-06-08T06:00:00Z",
+      "latitude": 14.20,
+      "longitude": 66.20,
+      "intensity": "Very Severe Cyclonic Storm",
+      "windSpeed": 70.0,
+      "pressure": 980.0
+    },
+    {
+      "timestamp": "2023-06-11T00:00:00Z",
+      "latitude": 18.20,
+      "longitude": 67.70,
+      "intensity": "Extremely Severe Cyclonic Storm",
+      "windSpeed": 90.0,
+      "pressure": 966.0
+    },
+    {
+      "timestamp": "2023-06-14T12:00:00Z",
+      "latitude": 21.80,
+      "longitude": 66.40,
+      "intensity": "Very Severe Cyclonic Storm",
+      "windSpeed": 75.0,
+      "pressure": 972.0
+    }
+  ],
+  "predictions": [
+    {
+      "forecastTime": "+6h",
+      "latitude": 22.30,
+      "longitude": 67.20,
+      "uncertainty": 25.0,
+      "predictedWindSpeed": 70.0,
+      "predictedPressure": 975.0,
+      "modelVersion": "Experimental Trajectory Baseline (Phase 1 Stub)",
+      "generatedAt": "2023-06-14T12:15:00Z"
+    },
+    {
+      "forecastTime": "+12h",
+      "latitude": 22.90,
+      "longitude": 68.10,
+      "uncertainty": 48.0,
+      "predictedWindSpeed": 65.0,
+      "predictedPressure": 978.0,
+      "modelVersion": "Experimental Trajectory Baseline (Phase 1 Stub)",
+      "generatedAt": "2023-06-14T12:15:00Z"
+    },
+    {
+      "forecastTime": "+24h",
+      "latitude": 23.60,
+      "longitude": 69.20,
+      "uncertainty": 95.0,
+      "predictedWindSpeed": 50.0,
+      "predictedPressure": 985.0,
+      "modelVersion": "Experimental Trajectory Baseline (Phase 1 Stub)",
+      "generatedAt": "2023-06-14T12:15:00Z"
+    }
+  ],
+  "uncertaintyPolygon": [
+    [21.80, 66.40],
+    [22.40, 66.80],
+    [23.10, 67.60],
+    [24.10, 68.70],
+    [24.20, 69.80],
+    [23.20, 69.70],
+    [22.50, 68.60],
+    [22.00, 67.30],
+    [21.80, 66.40]
+  ],
+  "risk": {
+    "riskLevel": "HIGH",
+    "windRisk": "HIGH (115-125 km/h gusts)",
+    "rainfallRisk": "HEAVY (150-200mm rainfall)",
+    "coastalRisk": "MODERATE (2.0m - 3.0m tidal surge)",
+    "exposureRisk": "HIGH (Gujarat coastal belt)",
+    "surgeEstimateMeters": 2.8,
+    "estimatedPopulationAtRisk": 1800000,
+    "generatedAt": "2023-06-14T12:20:00Z"
+  },
+  "environment": {
+    "seaSurfaceTemperature": 29.8,
+    "verticalWindShear": 14.5,
+    "meanSeaLevelPressure": 1004.0,
+    "relativeHumidityMidTroposphere": 72.0,
+    "outflowTemperature": -68.5,
+    "oceanHeatContent": 85.0,
+    "timestamp": "2023-06-14T12:00:00Z"
+  },
+  "digitalTwin": {
+    "radiusMaxWindKm": 35.0,
+    "hollandB": 1.35,
+    "coriolisF": 0.0000542,
+    "quadrantRadii": {
+      "R34": { "NE": 200.0, "SE": 160.0, "SW": 120.0, "NW": 175.0 },
+      "R50": { "NE": 95.0, "SE": 75.0, "SW": 55.0, "NW": 80.0 },
+      "R64": { "NE": 50.0, "SE": 40.0, "SW": 30.0, "NW": 45.0 }
+    },
+    "rightFrontQuadrantRisk": "NORTHEAST (NE) QUADRANT — Direct onshore gale exposure toward Gujarat coastline and Kutch gulf."
+  },
+  "provenance": {
+    "source": "IMD RSMC New Delhi & NOAA IBTrACS Official Best Track Dataset",
+    "timestamp": "2023-06-14T12:00:00Z",
+    "processingVersion": "v2.1.0-operational",
+    "modelVersion": "cyclone_detector_cnn_v2",
+    "dataType": "VERIFIED OBSERVATIONAL DATA",
+    "disclaimer": "OFFICIAL IMD BEST TRACK ARCHIVE DATASET. SATELLITE RADIOMETRY CALIBRATED."
+  }
+}
+
