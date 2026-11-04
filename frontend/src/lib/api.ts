@@ -8,9 +8,8 @@ import { HealthStatus, MLSystemStatus } from "@/types/health";
 import { MosdacTelemetryStatus, ImergTelemetryStatus, EnvironmentTelemetryStatus } from "@/types/data_intelligence";
 
 const BASE_URL =
-  typeof window !== "undefined"
-    ? "/api"
-    : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api");
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" ? "/api" : "http://127.0.0.1:8000/api");
 
 async function fetchJson<T>(endpoint: string): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;

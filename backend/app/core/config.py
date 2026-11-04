@@ -12,8 +12,10 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     DEMO_MODE: bool = False
     
-    # CORS Origins (Allow frontend development server)
+    # CORS Origins (Allow frontend production on Vercel & local development)
     CORS_ORIGINS: List[str] = [
+        "https://frontend-virid-nu-57pxwx9lvb.vercel.app",
+        "https://frontend-erl66fv60-paschim-banga-durgapuja-samannay-samity.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",

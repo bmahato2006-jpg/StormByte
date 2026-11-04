@@ -32,10 +32,13 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+from backend.app.schemas.health import HealthResponse
+
 # Configure Cross-Origin Resource Sharing (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +46,15 @@ app.add_middleware(
 
 # Exception handlers
 app.add_exception_handler(Exception, global_exception_handler)
+
+# Health endpoint (direct /health for cloud orchestrator probes & /api/health via api_router)
+@app.get("/health", response_model=HealthResponse, tags=["Health"], summary="System health check")
+def health():
+    return HealthResponse(
+        status="healthy",
+        service="cyclone-x",
+        version=settings.VERSION
+    )
 
 # Mount aggregated API routes under /api
 app.include_router(api_router, prefix=settings.API_PREFIX)
@@ -56,7 +68,8 @@ def root():
         "title": "CYCLONE-X Intelligence Platform API",
         "version": settings.VERSION,
         "docs": "/docs",
-        "health": "/api/health",
+        "health": "/health",
+        "api_health": "/api/health",
         "mode": "DEMO_MODE" if settings.DEMO_MODE else "LIVE_RESEARCH"
     }
 
