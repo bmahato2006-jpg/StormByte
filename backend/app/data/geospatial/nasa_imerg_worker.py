@@ -41,7 +41,11 @@ import stat
 import time
 from typing import Any, AsyncIterator, Dict, List, Optional, Tuple, Union
 
-import h5py
+try:
+    import h5py
+except Exception:
+    h5py = None
+
 import httpx
 import numpy as np
 import torch

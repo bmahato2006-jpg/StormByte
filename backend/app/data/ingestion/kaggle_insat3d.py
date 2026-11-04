@@ -23,7 +23,10 @@ from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image
 import numpy as np
 
-import kagglehub
+try:
+    import kagglehub
+except Exception:
+    kagglehub = None
 
 from backend.app.data.provenance import compute_file_sha256
 from backend.app.ml.detection.config import (
