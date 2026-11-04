@@ -1,0 +1,7 @@
+{
+  "model_name": "holland_vortex_pinn",
+  "physics_equation": "Navier-Stokes Radial Gradient Wind Equilibrium F(r) = 0",
+  "best_physics_loss": 5.512232e-11,
+  "collocation_points": 1000,
+  "status": "TRAINED"
+}

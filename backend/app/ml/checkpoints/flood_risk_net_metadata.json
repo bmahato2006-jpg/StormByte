@@ -1,0 +1,6 @@
+{
+  "model_name": "flood_risk_net",
+  "architecture": "SCS-CN Hydrological Runoff Neural Network",
+  "best_loss": 2.88564,
+  "status": "TRAINED"
+}

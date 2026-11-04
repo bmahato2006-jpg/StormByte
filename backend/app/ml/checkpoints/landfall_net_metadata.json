@@ -1,0 +1,18 @@
+{
+  "model_name": "landfall_net",
+  "architecture": "LandfallPredictorNet (Multi-Task Coastal Point & Lead Time Regressor)",
+  "status": "TRAINED",
+  "epochs": 12,
+  "training_time_seconds": 14.05,
+  "best_val_loss": 6.23963,
+  "test_metrics": {
+    "mean_coastal_error_km": 356.9,
+    "median_coastal_error_km": 250.28,
+    "lead_time_mae_hours": 68.74,
+    "landfall_probability_accuracy": 0.737,
+    "total_test_samples": 3365
+  },
+  "dataset": "NOAA IBTrACS North Indian Ocean Historical Tracks (1982-2024)",
+  "checkpoint_path": "C:\\Users\\bmaha\\OneDrive\\Desktop\\cyclone-x\\backend\\app\\ml\\checkpoints\\landfall_net.pt",
+  "timestamp": "2026-09-15T21:46:23.419940+00:00"
+}

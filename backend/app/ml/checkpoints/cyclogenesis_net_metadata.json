@@ -1,0 +1,43 @@
+{
+  "model_name": "cyclogenesis_net",
+  "framework": "PyTorch Neural Net",
+  "dataset": "NOAA NCEI IBTrACS Authentic Genesis Events + NIO Basin Controls",
+  "status": "TRAINED",
+  "n_samples": 6947,
+  "positive_genesis_samples": 1985,
+  "test_samples": 1390,
+  "roc_auc": 1.0,
+  "brier_score": 0.0,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "features": [
+    "coriolis_f",
+    "sst_celsius",
+    "vertical_wind_shear_kt",
+    "imerg_rain_rate_mmh",
+    "satellite_vortex_confidence",
+    "nearest_storm_dist_km",
+    "latitude"
+  ],
+  "feature_mean": [
+    3.4816443076124415e-05,
+    27.868600845336914,
+    22.316673278808594,
+    6.956323623657227,
+    0.38145217299461365,
+    815.0286865234375,
+    13.915122985839844
+  ],
+  "feature_std": [
+    1.8589065803098492e-05,
+    2.307861089706421,
+    9.462525367736816,
+    5.990590572357178,
+    0.2817012369632721,
+    630.2195434570312,
+    7.119912624359131
+  ],
+  "timestamp": "2026-09-22T22:22:40.545222+00:00"
+}

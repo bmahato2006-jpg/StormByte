@@ -1,0 +1,7 @@
+{
+  "model_name": "surge_deep_surrogate",
+  "architecture": "Deep ADCIRC/SLOSH Hydrodynamic Neural Surrogate",
+  "best_loss": 155.90685,
+  "training_scenarios": 3000,
+  "status": "TRAINED"
+}

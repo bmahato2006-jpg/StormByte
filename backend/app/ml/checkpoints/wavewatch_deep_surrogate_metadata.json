@@ -1,0 +1,8 @@
+{
+  "model_name": "wavewatch_deep_surrogate",
+  "architecture": "3rd-Gen Spectral Ocean Wave Surrogate (WAVEWATCH III / SWAN)",
+  "equations": "Wave Action Balance + Trapped Fetch Resonance + Battjes-Janssen Depth Breaking + Radiation Stress Setup",
+  "training_scenarios": 3500,
+  "best_loss": 30.6598,
+  "status": "TRAINED"
+}

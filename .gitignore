@@ -63,9 +63,31 @@ build/
 *.joblib
 *.tar.gz
 *.zip
-checkpoints/
-backend/app/ml/checkpoints/
-backend/checkpoints/
+/checkpoints/
+/backend/checkpoints/
+backend/app/ml/checkpoints/*
+
+# Whitelist lightweight production neural weights (< 100KB)
+!backend/app/ml/checkpoints/cyclogenesis_net.pt
+!backend/app/ml/checkpoints/cyclogenesis_net_metadata.json
+!backend/app/ml/checkpoints/early_cyclogenesis_head.pt
+!backend/app/ml/checkpoints/early_cyclogenesis_head_metadata.json
+!backend/app/ml/checkpoints/flood_risk_net.pt
+!backend/app/ml/checkpoints/flood_risk_net_metadata.json
+!backend/app/ml/checkpoints/holland_vortex_pinn.pt
+!backend/app/ml/checkpoints/holland_vortex_pinn_metadata.json
+!backend/app/ml/checkpoints/impact_neural_engine.pt
+!backend/app/ml/checkpoints/impact_neural_engine_metadata.json
+!backend/app/ml/checkpoints/landfall_net.pt
+!backend/app/ml/checkpoints/landfall_net_metadata.json
+!backend/app/ml/checkpoints/physics_advection_net.pt
+!backend/app/ml/checkpoints/physics_advection_net_metadata.json
+!backend/app/ml/checkpoints/rapid_intensification_net.pt
+!backend/app/ml/checkpoints/rapid_intensification_net_metadata.json
+!backend/app/ml/checkpoints/surge_deep_surrogate.pt
+!backend/app/ml/checkpoints/surge_deep_surrogate_metadata.json
+!backend/app/ml/checkpoints/wavewatch_deep_surrogate.pt
+!backend/app/ml/checkpoints/wavewatch_deep_surrogate_metadata.json
 
 # Virtual environments & Python cache
 .venv/

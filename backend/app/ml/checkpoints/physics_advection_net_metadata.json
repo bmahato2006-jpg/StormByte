@@ -1,0 +1,6 @@
+{
+  "model_name": "physics_advection_net",
+  "training_samples": 19136,
+  "best_loss": 0.52888,
+  "status": "TRAINED"
+}

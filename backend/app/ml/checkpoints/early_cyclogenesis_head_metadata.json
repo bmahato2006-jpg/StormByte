@@ -1,0 +1,43 @@
+{
+  "model_name": "EarlyCyclogenesisNeuralHead",
+  "version": "1.0.0",
+  "in_features": 10,
+  "feature_names": [
+    "coriolis_f",
+    "sst_celsius",
+    "vertical_wind_shear_kt",
+    "relative_vorticity_850",
+    "relative_humidity_700",
+    "tcc_area_growth",
+    "tcc_persistence_hours",
+    "convective_radius_km",
+    "curvature_score",
+    "current_wind_speed"
+  ],
+  "feature_mean": [
+    2.9336519219214097e-05,
+    28.11343765258789,
+    19.799001693725586,
+    2.860349655151367,
+    67.96248626708984,
+    563.6814575195312,
+    11.787209510803223,
+    147.77891540527344,
+    0.44774264097213745,
+    19.900053024291992
+  ],
+  "feature_std": [
+    1.2365880138531793e-05,
+    2.1608307361602783,
+    10.062479972839355,
+    2.0159690380096436,
+    13.481151580810547,
+    1863.3216552734375,
+    6.530035018920898,
+    50.1155891418457,
+    0.26777181029319763,
+    5.342454433441162
+  ],
+  "threshold_wind_kt": 34.0,
+  "target": "24_48h_cyclonic_storm_intensification"
+}

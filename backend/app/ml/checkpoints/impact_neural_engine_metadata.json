@@ -1,0 +1,6 @@
+{
+  "model_name": "impact_neural_engine",
+  "architecture": "Multi-Hazard Tabular Vulnerability Neural Engine",
+  "best_loss": 2574.9434,
+  "status": "TRAINED"
+}
