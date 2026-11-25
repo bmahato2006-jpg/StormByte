@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from backend.app.api.v1.health import router as health_router
+from backend.app.api.v1.auth import router as auth_router
 from backend.app.api.v1.cyclones import router as cyclones_router
 from backend.app.api.v1.data import router as data_router
 from backend.app.api.v1.observations import router as observations_router
@@ -24,6 +25,7 @@ api_router = APIRouter()
 
 # Include health router (/health -> when mounted under /api, becomes /api/health)
 api_router.include_router(health_router)
+api_router.include_router(auth_router)
 api_router.include_router(cyclones_router)
 api_router.include_router(data_router)
 api_router.include_router(observations_router)

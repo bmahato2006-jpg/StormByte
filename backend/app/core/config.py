@@ -11,7 +11,18 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     DEMO_MODE: bool = False
+    TESTING: bool = False
     
+    # Security & JWT Auth
+    SECRET_KEY: str = "stormbyte_production_secret_key_change_in_env_2026_super_secure"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    RATE_LIMIT_DEFAULT: str = "120/minute"
+    RATE_LIMIT_AUTH: str = "10/minute"
+    ADMIN_USERNAME: str = "admin"
+    ADMIN_PASSWORD: str = "Admin@StormByte2026!"
+    ADMIN_EMAIL: str = "admin@stormbyte.io"
+
     # CORS Origins (Allow frontend production on Vercel & local development)
     CORS_ORIGINS: List[str] = [
         "https://frontend-virid-nu-57pxwx9lvb.vercel.app",

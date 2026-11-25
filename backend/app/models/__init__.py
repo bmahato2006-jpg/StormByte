@@ -6,6 +6,7 @@ from backend.app.models.storm import (
     ForecastPoint,
     RiskRecord,
     AuditLog,
+    UserRecord,
 )
 
 __all__ = [
@@ -16,5 +17,6 @@ __all__ = [
     "ForecastPoint",
     "RiskRecord",
     "AuditLog",
+    "UserRecord",
 ]
 

@@ -14,9 +14,10 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 
 from backend.app.core.config import settings
+from backend.app.core.security import UserInDB, UserRole, require_roles
 from backend.app.data.ingestion.kaggle_insat3d import (
     PROVENANCE_PATH as KAGGLE_PROVENANCE_PATH,
     kaggle_ingestion_pipeline,
@@ -199,7 +200,9 @@ def get_dataset_samples(
 
 
 @router.post("/dataset/prepare", summary="Trigger Kaggle dataset download and manifest creation")
-def prepare_dataset():
+def prepare_dataset(
+    operator: UserInDB = Depends(require_roles([UserRole.ADMIN, UserRole.OPERATOR])),
+):
     """Runs ingestion pipeline to prepare and validate the Kaggle dataset."""
     try:
         prov = kaggle_ingestion_pipeline.run_pipeline()
@@ -404,7 +407,10 @@ async def predict_cyclone(
     response_model=DetectionTrainResponse,
     summary="Train CycloneDetectorCNN on authentic satellite tiles",
 )
-def train_detection(request: Optional[DetectionTrainRequest] = None):
+def train_detection(
+    request: Optional[DetectionTrainRequest] = None,
+    operator: UserInDB = Depends(require_roles([UserRole.ADMIN, UserRole.OPERATOR])),
+):
     """Executes deterministic training on authentic satellite image tiles."""
     epochs = request.epochs if request else 10
     batch_size = request.batch_size if request else 8

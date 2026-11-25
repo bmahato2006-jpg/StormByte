@@ -20,7 +20,10 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 from PIL import Image
-import torch
+try:
+    import torch
+except (ImportError, OSError):
+    torch = None
 
 from backend.app.data.geospatial.mosdac_ingestion_worker import (
     MOSDACAccountLockedError,
@@ -44,13 +47,16 @@ class SatellitePipelineService:
         worker: Optional[MOSDACIngestionWorker] = None,
         auth_config: Optional[MOSDACAuthConfig] = None,
         polling_interval_seconds: int = 1800,  # 30 minutes
-        device: Optional[torch.device] = None,
+        device: Optional[Any] = None,
         allow_open_fallback: bool = True,
     ) -> None:
         self.auth_config = auth_config or MOSDACAuthConfig.from_environment()
         self.worker = worker or MOSDACIngestionWorker(config=self.auth_config)
         self.polling_interval_seconds = polling_interval_seconds
-        self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch is not None:
+            self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = "cpu"
         self.allow_open_fallback = allow_open_fallback
 
         # Telemetry State Cache

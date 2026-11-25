@@ -13,9 +13,11 @@ import re
 from typing import Any, Dict, List, Optional
 import uuid
 
-from fastapi import APIRouter, File, HTTPException, Query, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
+
+from backend.app.core.security import UserInDB, UserRole, require_roles
 
 from backend.app.data.geospatial.reader import read_raster
 from backend.app.data.geospatial.schemas import (
@@ -856,7 +858,10 @@ def get_nasa_token_status():
 
 
 @router.post("/nasa/fetch-live", summary="Fetch today's real NASA satellite scene and run AI pipeline")
-def fetch_live_nasa_and_analyze(payload: NASAFetchLiveRequest):
+def fetch_live_nasa_and_analyze(
+    payload: NASAFetchLiveRequest,
+    operator: UserInDB = Depends(require_roles([UserRole.ADMIN, UserRole.OPERATOR])),
+):
     """Fetches today's live satellite scene directly from NASA GIBS/Earthdata and runs the AI pipeline."""
     from backend.app.data.geospatial.nasa_earthdata_live import fetch_live_nasa_scene
     try:
@@ -879,7 +884,10 @@ def fetch_live_nasa_and_analyze(payload: NASAFetchLiveRequest):
 
 
 @router.post("/imd/fetch-live", summary="Fetch freshest 30-min IMD INSAT-3D scene and run AI pipeline")
-def fetch_live_imd_and_analyze(payload: IMDFetchLiveRequest):
+def fetch_live_imd_and_analyze(
+    payload: IMDFetchLiveRequest,
+    operator: UserInDB = Depends(require_roles([UserRole.ADMIN, UserRole.OPERATOR])),
+):
     """Fetches freshest 30-min geostationary satellite scene from IMD and runs the AI pipeline."""
     from backend.app.data.geospatial.imd_insat_live import fetch_live_imd_insat_scene
     try:

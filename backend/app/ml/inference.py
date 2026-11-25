@@ -18,7 +18,10 @@ from typing import Any, Dict, Optional, Tuple, Union
 import uuid
 import numpy as np
 from PIL import Image
-import torch
+try:
+    import torch
+except (ImportError, OSError):
+    torch = None
 
 from backend.app.schemas.analysis import (
     AnalysisMode,
@@ -397,7 +400,7 @@ inference_pipeline = SatelliteInferencePipeline()
 
 
 def run_detection_pipeline(
-    image_or_tensor: Union[torch.Tensor, np.ndarray, Image.Image, bytes, str, Path],
+    image_or_tensor: Union[Any, np.ndarray, Image.Image, bytes, str, Path],
     threshold: float = 0.50,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
@@ -429,7 +432,7 @@ def run_detection_pipeline(
         raise RuntimeError("No trained cyclone detection model available.")
 
     pil_img: Image.Image
-    if isinstance(image_or_tensor, torch.Tensor):
+    if torch is not None and isinstance(image_or_tensor, torch.Tensor):
         t = image_or_tensor.detach().cpu().float()
         if t.ndim == 4:
             t = t.squeeze(0)

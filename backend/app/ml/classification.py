@@ -8,7 +8,10 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 import numpy as np
 from PIL import Image
-import torch
+try:
+    import torch
+except (ImportError, OSError):
+    torch = None
 
 from backend.app.schemas.analysis import ClassificationResult, ConfidenceTier
 
@@ -21,6 +24,8 @@ class CycloneClassifier:
         self._model_loaded = False
 
     def _get_dvorak_model(self):
+        if torch is None:
+            return None
         if not self._model_loaded:
             try:
                 ckpt_path = Path(__file__).resolve().parents[2] / "backend" / "app" / "ml" / "checkpoints" / "intensity_dvorak_net.pt"
